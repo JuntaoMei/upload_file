@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +26,17 @@ public class FileSystemStorageService implements StorageService {
         this.rootLocation = Paths.get(properties.getLocation());
     }
 
+    @Override
+    public void store(String metaData) {
+        if (metaData == null || metaData.length() == 0) {
+            return;
+        }
+        try(  PrintWriter out = new PrintWriter(this.rootLocation.resolve(metaData.substring(0, Math.min(4, metaData.length() - 1))).toString())  ){
+            out.println( metaData );
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public void store(MultipartFile file) {
         try {
